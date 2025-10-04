@@ -1,4 +1,6 @@
-package com.example.resource.exception;
+package dev.tbyte.resource.exception;
+
+import java.util.Date;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -6,8 +8,6 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
-
-import java.util.Date;
 
 /**
  * Global exception handler to process exceptions thrown by controllers.
@@ -17,7 +17,8 @@ public class GlobalExceptionHandler {
 
     /**
      * Handles ResourceNotFoundException.
-     * @param ex the exception
+     * 
+     * @param ex      the exception
      * @param request the web request
      * @return a response entity with error details
      */
@@ -29,19 +30,22 @@ public class GlobalExceptionHandler {
 
     /**
      * Handles AccessDeniedException.
-     * @param ex the exception
+     * 
+     * @param ex      the exception
      * @param request the web request
      * @return a response entity with error details
      */
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<?> accessDeniedException(AccessDeniedException ex, WebRequest request) {
-        ErrorDetails errorDetails = new ErrorDetails(new Date(), "Access Denied: " + ex.getMessage(), request.getDescription(false));
+        ErrorDetails errorDetails = new ErrorDetails(new Date(), "Access Denied: " + ex.getMessage(),
+                request.getDescription(false));
         return new ResponseEntity<>(errorDetails, HttpStatus.FORBIDDEN);
     }
 
     /**
      * Handles all other exceptions.
-     * @param ex the exception
+     * 
+     * @param ex      the exception
      * @param request the web request
      * @return a response entity with error details
      */
@@ -66,11 +70,28 @@ public class GlobalExceptionHandler {
         }
 
         // Getters and setters
-        public Date getTimestamp() { return timestamp; }
-        public void setTimestamp(Date timestamp) { this.timestamp = timestamp; }
-        public String getMessage() { return message; }
-        public void setMessage(String message) { this.message = message; }
-        public String getDetails() { return details; }
-        public void setDetails(String details) { this.details = details; }
+        public Date getTimestamp() {
+            return timestamp;
+        }
+
+        public void setTimestamp(Date timestamp) {
+            this.timestamp = timestamp;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public void setMessage(String message) {
+            this.message = message;
+        }
+
+        public String getDetails() {
+            return details;
+        }
+
+        public void setDetails(String details) {
+            this.details = details;
+        }
     }
 }

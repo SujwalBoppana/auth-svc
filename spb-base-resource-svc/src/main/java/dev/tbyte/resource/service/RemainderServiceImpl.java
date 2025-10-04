@@ -1,15 +1,16 @@
-package com.example.resource.service;
-
-import com.example.resource.dto.RemainderDto;
-import com.example.resource.entity.Remainder;
-import com.example.resource.exception.ResourceNotFoundException;
-import com.example.resource.repository.RemainderRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.stereotype.Service;
+package dev.tbyte.resource.service;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.stereotype.Service;
+
+import dev.tbyte.resource.dto.RemainderDto;
+import dev.tbyte.resource.entity.Remainder;
+import dev.tbyte.resource.exception.ResourceNotFoundException;
+import dev.tbyte.resource.repository.RemainderRepository;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
