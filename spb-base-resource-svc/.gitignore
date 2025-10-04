@@ -1,0 +1,24 @@
+# Build artifacts
+target/
+*.jar
+*.war
+*.ear
+
+# IDE files
+.idea/
+*.iml
+*.iws
+.classpath
+.project
+.settings/
+
+# Log files
+*.log
+
+# Dependency directories
+node_modules/
+
+# Maven files
+.mvn/
+mvnw
+mvnw.cmd
