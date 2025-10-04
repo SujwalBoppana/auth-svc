@@ -1,0 +1,6 @@
+/app/spb-base-resource-svc/src/main/java/com/example/spbbaseresourcesvc/controller/ResourceController.java
+/app/spb-base-resource-svc/src/main/java/com/example/spbbaseresourcesvc/config/SwaggerConfig.java
+/app/spb-base-resource-svc/src/main/java/com/example/spbbaseresourcesvc/config/SecurityConfig.java
+/app/spb-base-resource-svc/src/main/java/com/example/spbbaseresourcesvc/filter/JwtAuthenticationFilter.java
+/app/spb-base-resource-svc/src/main/java/com/example/spbbaseresourcesvc/SpbBaseResourceSvcApplication.java
+/app/spb-base-resource-svc/src/main/java/com/example/spbbaseresourcesvc/util/JwtUtil.java
