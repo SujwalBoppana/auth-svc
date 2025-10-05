@@ -9,7 +9,6 @@ import dev.tbyte.auth.dto.AuthorityDto;
 import dev.tbyte.auth.entity.Authority;
 import dev.tbyte.auth.exception.ResourceNotFoundException;
 import dev.tbyte.auth.repository.AuthorityRepository;
-import dev.tbyte.auth.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -21,9 +20,6 @@ public class AuthorityServiceImpl implements AuthorityService {
     @Override
     public AuthorityDto createAuthority(AuthorityDto authorityDto) {
         Authority authority = toEntity(authorityDto);
-        Long currentUserId = SecurityUtil.getCurrentUserId();
-        authority.setCreatedBy(currentUserId);
-        authority.setUpdatedBy(currentUserId);
         Authority savedAuthority = authorityRepository.save(authority);
         return toDto(savedAuthority);
     }
@@ -46,18 +42,16 @@ public class AuthorityServiceImpl implements AuthorityService {
                 .orElseThrow(() -> new ResourceNotFoundException("Authority not found with id: " + id));
         existingAuthority.setName(authorityDto.getName());
         existingAuthority.setCode(authorityDto.getCode());
-        existingAuthority.setUpdatedBy(SecurityUtil.getCurrentUserId());
         Authority updatedAuthority = authorityRepository.save(existingAuthority);
         return toDto(updatedAuthority);
     }
 
     @Override
     public void deleteAuthority(Long id) {
-        Authority authority = authorityRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Authority not found with id: " + id));
-        authority.setDeleted(true);
-        authority.setUpdatedBy(SecurityUtil.getCurrentUserId());
-        authorityRepository.save(authority);
+        if (!authorityRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Authority not found with id: " + id);
+        }
+        authorityRepository.deleteById(id);
     }
 
     private AuthorityDto toDto(Authority authority) {
@@ -65,11 +59,6 @@ public class AuthorityServiceImpl implements AuthorityService {
         dto.setId(authority.getId());
         dto.setName(authority.getName());
         dto.setCode(authority.getCode());
-        dto.setCreatedAt(authority.getCreatedAt());
-        dto.setUpdatedAt(authority.getUpdatedAt());
-        dto.setCreatedBy(authority.getCreatedBy());
-        dto.setUpdatedBy(authority.getUpdatedBy());
-        dto.setDeleted(authority.isDeleted());
         return dto;
     }
 
