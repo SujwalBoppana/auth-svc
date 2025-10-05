@@ -5,12 +5,14 @@ import dev.tbyte.auth.entity.Role;
 import dev.tbyte.auth.repository.AuthorityRepository;
 import dev.tbyte.auth.repository.RoleRepository;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.List;
 
 @Component
+@Profile("!test")
 public class DataInitializer implements CommandLineRunner {
 
     private final RoleRepository roleRepository;
@@ -33,6 +35,7 @@ public class DataInitializer implements CommandLineRunner {
             if (authorityRepository.findByName(auth).isEmpty()) {
                 Authority authority = new Authority();
                 authority.setName(auth);
+                authority.setCode(auth);
                 authorityRepository.save(authority);
             }
         }
