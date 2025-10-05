@@ -18,10 +18,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import dev.tbyte.auth.dto.LoginRequest;
 import dev.tbyte.auth.dto.RegisterRequest;
+import dev.tbyte.auth.entity.Gender;
 import dev.tbyte.auth.entity.Role;
-import dev.tbyte.auth.entity.User;
 import dev.tbyte.auth.repository.RoleRepository;
-import dev.tbyte.auth.repository.UserRepository;
+
+import java.util.Date;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -35,13 +36,7 @@ public class AuthenticationControllerTest {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
     private RoleRepository roleRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     @BeforeEach
     void setUp() {
@@ -60,6 +55,9 @@ public class AuthenticationControllerTest {
         registerRequest.setFirstName("Test");
         registerRequest.setLastName("User");
         registerRequest.setRoleCode("USER");
+        registerRequest.setDob(new Date());
+        registerRequest.setGender(Gender.MALE);
+        registerRequest.setPhone("1234567890");
 
         mockMvc.perform(post("/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)

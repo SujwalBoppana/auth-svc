@@ -13,21 +13,32 @@ import dev.tbyte.auth.entity.Gender;
 
 @Data
 public class RegisterRequest {
-    @NotBlank
+    @NotBlank(message = "First name is required")
     private String firstName;
+
     private String middleName;
-    @NotBlank
+
+    @NotBlank(message = "Last name is required")
     private String lastName;
+
+    @NotNull(message = "Date of birth is required")
     private Date dob;
+
+    @NotNull(message = "Gender is required")
     private Gender gender;
-    @NotBlank
-    @Email
+
+    @NotBlank(message = "Email is required")
+    @Email(message = "Invalid email format")
     private String email;
-    @Pattern(regexp = "^\\d{10}$")
+
+    @NotBlank(message = "Phone number is required")
+    @Pattern(regexp = "^\\d{10}$", message = "Phone number must be 10 digits")
     private String phone;
-    @NotBlank
-    @Size(min = 8)
+
+    @NotBlank(message = "Password is required")
+    @Size(min = 8, message = "Password must be at least 8 characters long")
     private String password;
-    @NotNull
+
+    @NotBlank(message = "Role code is required")
     private String roleCode; // e.g., "USER", "ADMIN"
 }
