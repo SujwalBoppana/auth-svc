@@ -14,6 +14,7 @@ import dev.tbyte.auth.entity.User;
 import dev.tbyte.auth.exception.ResourceNotFoundException;
 import dev.tbyte.auth.repository.RoleRepository;
 import dev.tbyte.auth.repository.UserRepository;
+import dev.tbyte.auth.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -31,6 +32,9 @@ public class UserServiceImpl implements UserService {
     public UserDto registerUser(RegisterRequest registerRequest) {
         User user = toEntity(registerRequest);
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword() + salt));
+        Long currentUserId = SecurityUtil.getCurrentUserId();
+        user.setCreatedBy(currentUserId);
+        user.setUpdatedBy(currentUserId);
         User savedUser = userRepository.save(user);
         return toDto(savedUser);
     }
@@ -39,6 +43,9 @@ public class UserServiceImpl implements UserService {
     public UserDto createUser(UserCreationRequest userCreationRequest) {
         User user = toEntity(userCreationRequest);
         user.setPassword(passwordEncoder.encode(userCreationRequest.getPassword() + salt));
+        Long currentUserId = SecurityUtil.getCurrentUserId();
+        user.setCreatedBy(currentUserId);
+        user.setUpdatedBy(currentUserId);
         User savedUser = userRepository.save(user);
         return toDto(savedUser);
     }
@@ -67,6 +74,7 @@ public class UserServiceImpl implements UserService {
         existingUser.setGender(userDto.getGender());
         existingUser.setEmail(userDto.getEmail());
         existingUser.setPhone(userDto.getPhone());
+        existingUser.setUpdatedBy(SecurityUtil.getCurrentUserId());
 
         if (userDto.getRoleCode() != null) {
             Role role = roleRepository.findByCode(userDto.getRoleCode())
@@ -80,10 +88,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(Long id) {
-        if (!userRepository.existsById(id)) {
-            throw new ResourceNotFoundException("User not found with id: " + id);
-        }
-        userRepository.deleteById(id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+        user.setDeleted(true);
+        user.setUpdatedBy(SecurityUtil.getCurrentUserId());
+        userRepository.save(user);
     }
 
     @Override
@@ -101,6 +110,11 @@ public class UserServiceImpl implements UserService {
     private UserDto toDto(User user) {
         UserDto dto = new UserDto();
         dto.setId(user.getId());
+        dto.setCreatedAt(user.getCreatedAt());
+        dto.setUpdatedAt(user.getUpdatedAt());
+        dto.setCreatedBy(user.getCreatedBy());
+        dto.setUpdatedBy(user.getUpdatedBy());
+        dto.setDeleted(user.isDeleted());
         dto.setFirstName(user.getFirstName());
         dto.setMiddleName(user.getMiddleName());
         dto.setLastName(user.getLastName());
