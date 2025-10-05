@@ -6,6 +6,8 @@ import java.util.stream.Collectors;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import dev.tbyte.auth.dto.RegisterRequest;
+import dev.tbyte.auth.dto.UserCreationRequest;
 import dev.tbyte.auth.dto.UserDto;
 import dev.tbyte.auth.entity.Role;
 import dev.tbyte.auth.entity.User;
@@ -26,9 +28,17 @@ public class UserServiceImpl implements UserService {
     private String salt;
 
     @Override
-    public UserDto createUser(UserDto userDto) {
-        User user = toEntity(userDto);
-        user.setPassword(passwordEncoder.encode(userDto.getPassword() + salt));
+    public UserDto registerUser(RegisterRequest registerRequest) {
+        User user = toEntity(registerRequest);
+        user.setPassword(passwordEncoder.encode(registerRequest.getPassword() + salt));
+        User savedUser = userRepository.save(user);
+        return toDto(savedUser);
+    }
+
+    @Override
+    public UserDto createUser(UserCreationRequest userCreationRequest) {
+        User user = toEntity(userCreationRequest);
+        user.setPassword(passwordEncoder.encode(userCreationRequest.getPassword() + salt));
         User savedUser = userRepository.save(user);
         return toDto(savedUser);
     }
@@ -107,6 +117,42 @@ public class UserServiceImpl implements UserService {
     private User toEntity(UserDto dto) {
         User user = new User();
         user.setId(dto.getId());
+        user.setFirstName(dto.getFirstName());
+        user.setMiddleName(dto.getMiddleName());
+        user.setLastName(dto.getLastName());
+        user.setDob(dto.getDob());
+        user.setGender(dto.getGender());
+        user.setEmail(dto.getEmail());
+        user.setPhone(dto.getPhone());
+
+        if (dto.getRoleCode() != null) {
+            Role role = roleRepository.findByCode(dto.getRoleCode())
+                    .orElseThrow(() -> new ResourceNotFoundException("Role not found with code: " + dto.getRoleCode()));
+            user.setRole(role);
+        }
+        return user;
+    }
+
+    private User toEntity(UserCreationRequest dto) {
+        User user = new User();
+        user.setFirstName(dto.getFirstName());
+        user.setMiddleName(dto.getMiddleName());
+        user.setLastName(dto.getLastName());
+        user.setDob(dto.getDob());
+        user.setGender(dto.getGender());
+        user.setEmail(dto.getEmail());
+        user.setPhone(dto.getPhone());
+
+        if (dto.getRoleCode() != null) {
+            Role role = roleRepository.findByCode(dto.getRoleCode())
+                    .orElseThrow(() -> new ResourceNotFoundException("Role not found with code: " + dto.getRoleCode()));
+            user.setRole(role);
+        }
+        return user;
+    }
+
+    private User toEntity(RegisterRequest dto) {
+        User user = new User();
         user.setFirstName(dto.getFirstName());
         user.setMiddleName(dto.getMiddleName());
         user.setLastName(dto.getLastName());

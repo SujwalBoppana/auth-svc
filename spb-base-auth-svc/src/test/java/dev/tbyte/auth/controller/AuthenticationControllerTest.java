@@ -1,6 +1,8 @@
 package dev.tbyte.auth.controller;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -76,5 +78,25 @@ public class AuthenticationControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accessToken").isNotEmpty())
                 .andExpect(jsonPath("$.refreshToken").isNotEmpty());
+    }
+
+    @Test
+    void whenRegisterWithMismatchedPasswords_thenReturns400() throws Exception {
+        RegisterRequest registerRequest = new RegisterRequest();
+        registerRequest.setEmail("testuser@example.com");
+        registerRequest.setPassword("password123");
+        registerRequest.setConfirmPassword("password456");
+        registerRequest.setFirstName("Test");
+        registerRequest.setLastName("User");
+        registerRequest.setRoleCode("USER");
+        registerRequest.setDob(new Date());
+        registerRequest.setGender(Gender.MALE);
+        registerRequest.setPhone("1234567890");
+
+        mockMvc.perform(post("/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(registerRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.registerRequest").value("Passwords do not match. Please re-enter matching passwords."));
     }
 }

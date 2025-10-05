@@ -18,10 +18,7 @@ import dev.tbyte.auth.dto.LoginRequest;
 import dev.tbyte.auth.dto.RefreshTokenRequest;
 import dev.tbyte.auth.dto.RegisterRequest;
 import dev.tbyte.auth.dto.UserDto;
-import dev.tbyte.auth.entity.Role;
 import dev.tbyte.auth.entity.User;
-import dev.tbyte.auth.exception.ResourceNotFoundException;
-import dev.tbyte.auth.repository.RoleRepository;
 import dev.tbyte.auth.repository.UserRepository;
 import dev.tbyte.auth.service.CustomUserDetailsService;
 import dev.tbyte.auth.service.UserService;
@@ -39,36 +36,14 @@ public class AuthenticationController {
     private final CustomUserDetailsService userDetailsService;
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
-    private final PasswordEncoder passwordEncoder;
     private final UserService userService;
-
-    @Value("${auth.password.salt}")
-    private String salt;
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
         if (userRepository.findByEmail(registerRequest.getEmail()).isPresent()) {
             return ResponseEntity.badRequest().body("Error: Email is already in use!");
         }
-
-        User user = new User();
-        user.setFirstName(registerRequest.getFirstName());
-        user.setMiddleName(registerRequest.getMiddleName());
-        user.setLastName(registerRequest.getLastName());
-        user.setEmail(registerRequest.getEmail());
-        user.setPassword(passwordEncoder.encode(registerRequest.getPassword() + salt));
-        user.setDob(registerRequest.getDob());
-        user.setGender(registerRequest.getGender());
-        user.setPhone(registerRequest.getPhone());
-
-        Role userRole = roleRepository.findByCode(registerRequest.getRoleCode())
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Role not found with code: " + registerRequest.getRoleCode()));
-        user.setRole(userRole);
-
-        userRepository.save(user);
-
+        userService.registerUser(registerRequest);
         return ResponseEntity.ok("User registered successfully!");
     }
 

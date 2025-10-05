@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import dev.tbyte.auth.dto.UserCreationRequest;
 import dev.tbyte.auth.dto.UserDto;
 import dev.tbyte.auth.service.UserService;
 import jakarta.validation.Valid;
@@ -23,8 +24,8 @@ public class UserController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<UserDto> createUser(@Valid @RequestBody UserDto userDto) {
-        return new ResponseEntity<>(userService.createUser(userDto), HttpStatus.CREATED);
+    public ResponseEntity<UserDto> createUser(@Valid @RequestBody UserCreationRequest userCreationRequest) {
+        return new ResponseEntity<>(userService.createUser(userCreationRequest), HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
