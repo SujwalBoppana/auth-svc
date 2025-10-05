@@ -57,9 +57,11 @@ public class UserServiceImpl implements UserService {
         existingUser.setEmail(userDto.getEmail());
         existingUser.setPhone(userDto.getPhone());
 
-        Role role = roleRepository.findById(userDto.getRoleId())
-                .orElseThrow(() -> new ResourceNotFoundException("Role not found with id: " + userDto.getRoleId()));
-        existingUser.setRole(role);
+        if (userDto.getRoleCode() != null) {
+            Role role = roleRepository.findByCode(userDto.getRoleCode())
+                    .orElseThrow(() -> new ResourceNotFoundException("Role not found with code: " + userDto.getRoleCode()));
+            existingUser.setRole(role);
+        }
 
         User updatedUser = userRepository.save(existingUser);
         return toDto(updatedUser);
@@ -79,6 +81,12 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
     }
 
+    @Override
+    public UserDto getUserByEmail(String email) {
+        User user = findByEmail(email);
+        return toDto(user);
+    }
+
     private UserDto toDto(User user) {
         UserDto dto = new UserDto();
         dto.setId(user.getId());
@@ -90,7 +98,7 @@ public class UserServiceImpl implements UserService {
         dto.setEmail(user.getEmail());
         dto.setPhone(user.getPhone());
         if (user.getRole() != null) {
-            dto.setRoleId(user.getRole().getId());
+            dto.setRoleCode(user.getRole().getCode());
         }
         return dto;
     }
@@ -106,9 +114,9 @@ public class UserServiceImpl implements UserService {
         user.setEmail(dto.getEmail());
         user.setPhone(dto.getPhone());
 
-        if (dto.getRoleId() != null) {
-            Role role = roleRepository.findById(dto.getRoleId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Role not found with id: " + dto.getRoleId()));
+        if (dto.getRoleCode() != null) {
+            Role role = roleRepository.findByCode(dto.getRoleCode())
+                    .orElseThrow(() -> new ResourceNotFoundException("Role not found with code: " + dto.getRoleCode()));
             user.setRole(role);
         }
         return user;

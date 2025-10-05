@@ -103,16 +103,6 @@ public class AuthenticationController {
     public ResponseEntity<UserDto> getProfile(Authentication authentication) {
         String email = authentication.getName();
         User user = userService.findByEmail(email);
-        UserDto userDto = new UserDto();
-        userDto.setId(user.getId());
-        userDto.setFirstName(user.getFirstName());
-        userDto.setMiddleName(user.getMiddleName());
-        userDto.setLastName(user.getLastName());
-        userDto.setDob(user.getDob());
-        userDto.setGender(user.getGender());
-        userDto.setEmail(user.getEmail());
-        userDto.setPhone(user.getPhone());
-        userDto.setRoleId(user.getRole().getId());
-        return ResponseEntity.ok(userDto);
+        return ResponseEntity.ok(userService.getUserById(user.getId()));
     }
 }

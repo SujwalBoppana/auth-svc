@@ -1,22 +1,32 @@
 package dev.tbyte.resource.service;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.stereotype.Service;
-
 import dev.tbyte.resource.dto.RemainderDto;
+import dev.tbyte.resource.dto.UserDto;
 import dev.tbyte.resource.entity.Remainder;
 import dev.tbyte.resource.exception.ResourceNotFoundException;
 import dev.tbyte.resource.repository.RemainderRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriUtils;
+
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class RemainderServiceImpl implements RemainderService {
 
     private final RemainderRepository remainderRepository;
+    private final WebClient.Builder webClientBuilder;
+
+    @Value("${auth.service.url}")
+    private String authServiceUrl;
 
     @Override
     public RemainderDto createRemainder(RemainderDto remainderDto, String userId) {
@@ -68,24 +78,39 @@ public class RemainderServiceImpl implements RemainderService {
     }
 
     private RemainderDto toDto(Remainder remainder) {
-        RemainderDto dto = new RemainderDto();
-        dto.setId(remainder.getId());
-        dto.setTitle(remainder.getTitle());
-        dto.setDescription(remainder.getDescription());
-        dto.setReminderDateTime(remainder.getReminderDateTime());
-        dto.setUserId(remainder.getUserId());
-        dto.setCreatedAt(remainder.getCreatedAt());
-        dto.setUpdatedAt(remainder.getUpdatedAt());
-        return dto;
+        UserDto userDto = fetchUserFromAuthService(remainder.getUserId());
+        RemainderDto remainderDto = new RemainderDto();
+        remainderDto.setId(remainder.getId());
+        remainderDto.setTitle(remainder.getTitle());
+        remainderDto.setDescription(remainder.getDescription());
+        remainderDto.setReminderDateTime(remainder.getReminderDateTime());
+        remainderDto.setUser(userDto);
+        return remainderDto;
     }
 
     private Remainder toEntity(RemainderDto dto) {
         Remainder remainder = new Remainder();
-        remainder.setId(dto.getId());
+        if (dto.getId() != null) {
+            remainder.setId(dto.getId());
+        }
         remainder.setTitle(dto.getTitle());
         remainder.setDescription(dto.getDescription());
         remainder.setReminderDateTime(dto.getReminderDateTime());
         // userId is set from the security context, not the DTO
         return remainder;
+    }
+
+    private UserDto fetchUserFromAuthService(String userId) {
+        Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String token = jwt.getTokenValue();
+        String encodedUserId = UriUtils.encode(userId, StandardCharsets.UTF_8);
+
+        return webClientBuilder.build()
+                .get()
+                .uri(authServiceUrl + "/users/by-email/" + encodedUserId)
+                .header("Authorization", "Bearer " + token)
+                .retrieve()
+                .bodyToMono(UserDto.class)
+                .block();
     }
 }

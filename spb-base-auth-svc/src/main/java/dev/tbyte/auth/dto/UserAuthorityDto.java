@@ -5,6 +5,6 @@ import lombok.Data;
 @Data
 public class UserAuthorityDto {
     private Long id;
-    private Long userId;
-    private Long authorityId;
+    private String userName;
+    private String authorityName;
 }

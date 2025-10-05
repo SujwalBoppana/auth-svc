@@ -3,6 +3,7 @@ package dev.tbyte.auth.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -22,6 +23,7 @@ public class RegisterRequest {
     @NotBlank
     @Email
     private String email;
+    @Pattern(regexp = "^\\d{10}$")
     private String phone;
     @NotBlank
     @Size(min = 8)

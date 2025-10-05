@@ -25,12 +25,12 @@ public class UserAuthorityServiceImpl implements UserAuthorityService {
 
     @Override
     public UserAuthorityDto grantAuthorityToUser(UserAuthorityDto userAuthorityDto) {
-        User user = userRepository.findById(userAuthorityDto.getUserId())
+        User user = userRepository.findByEmail(userAuthorityDto.getUserName())
                 .orElseThrow(
-                        () -> new ResourceNotFoundException("User not found with id: " + userAuthorityDto.getUserId()));
-        Authority authority = authorityRepository.findById(userAuthorityDto.getAuthorityId())
+                        () -> new ResourceNotFoundException("User not found with email: " + userAuthorityDto.getUserName()));
+        Authority authority = authorityRepository.findByName(userAuthorityDto.getAuthorityName())
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Authority not found with id: " + userAuthorityDto.getAuthorityId()));
+                        "Authority not found with name: " + userAuthorityDto.getAuthorityName()));
 
         UserAuthority userAuthority = new UserAuthority();
         userAuthority.setUser(user);
@@ -75,12 +75,12 @@ public class UserAuthorityServiceImpl implements UserAuthorityService {
         UserAuthority existingMapping = userAuthorityRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("UserAuthority mapping not found with id: " + id));
 
-        User user = userRepository.findById(userAuthorityDto.getUserId())
+        User user = userRepository.findByEmail(userAuthorityDto.getUserName())
                 .orElseThrow(
-                        () -> new ResourceNotFoundException("User not found with id: " + userAuthorityDto.getUserId()));
-        Authority authority = authorityRepository.findById(userAuthorityDto.getAuthorityId())
+                        () -> new ResourceNotFoundException("User not found with email: " + userAuthorityDto.getUserName()));
+        Authority authority = authorityRepository.findByName(userAuthorityDto.getAuthorityName())
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Authority not found with id: " + userAuthorityDto.getAuthorityId()));
+                        "Authority not found with name: " + userAuthorityDto.getAuthorityName()));
 
         existingMapping.setUser(user);
         existingMapping.setAuthority(authority);
@@ -92,8 +92,8 @@ public class UserAuthorityServiceImpl implements UserAuthorityService {
     private UserAuthorityDto toDto(UserAuthority userAuthority) {
         UserAuthorityDto dto = new UserAuthorityDto();
         dto.setId(userAuthority.getId());
-        dto.setUserId(userAuthority.getUser().getId());
-        dto.setAuthorityId(userAuthority.getAuthority().getId());
+        dto.setUserName(userAuthority.getUser().getEmail());
+        dto.setAuthorityName(userAuthority.getAuthority().getName());
         return dto;
     }
 }

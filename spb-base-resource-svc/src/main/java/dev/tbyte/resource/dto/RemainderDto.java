@@ -1,8 +1,8 @@
 package dev.tbyte.resource.dto;
 
-import java.time.LocalDateTime;
-
 import lombok.Data;
+
+import java.time.LocalDateTime;
 
 @Data
 public class RemainderDto {
@@ -10,7 +10,5 @@ public class RemainderDto {
     private String title;
     private String description;
     private LocalDateTime reminderDateTime;
-    private String userId;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private UserDto user;
 }
