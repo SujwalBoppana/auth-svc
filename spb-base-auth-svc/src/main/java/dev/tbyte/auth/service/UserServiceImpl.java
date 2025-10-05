@@ -3,9 +3,12 @@ package dev.tbyte.auth.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import dev.tbyte.auth.dto.AdminPasswordResetRequest;
+import dev.tbyte.auth.dto.ForgotPasswordRequest;
 import dev.tbyte.auth.dto.UserDto;
 import dev.tbyte.auth.entity.Role;
 import dev.tbyte.auth.entity.User;
@@ -120,5 +123,27 @@ public class UserServiceImpl implements UserService {
             user.setRole(role);
         }
         return user;
+    }
+
+    @Override
+    public void forgotPassword(ForgotPasswordRequest forgotPasswordRequest) {
+        if (!forgotPasswordRequest.getNewPassword().equals(forgotPasswordRequest.getConfirmPassword())) {
+            throw new IllegalArgumentException("Passwords do not match");
+        }
+        User user = userRepository.findByEmail(forgotPasswordRequest.getEmail())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + forgotPasswordRequest.getEmail()));
+        user.setPassword(passwordEncoder.encode(forgotPasswordRequest.getNewPassword()));
+        userRepository.save(user);
+    }
+
+    @Override
+    public void adminResetPassword(AdminPasswordResetRequest adminPasswordResetRequest) {
+        if (!adminPasswordResetRequest.getNewPassword().equals(adminPasswordResetRequest.getConfirmPassword())) {
+            throw new IllegalArgumentException("Passwords do not match");
+        }
+        User user = userRepository.findById(adminPasswordResetRequest.getUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + adminPasswordResetRequest.getUserId()));
+        user.setPassword(passwordEncoder.encode(adminPasswordResetRequest.getNewPassword()));
+        userRepository.save(user);
     }
 }

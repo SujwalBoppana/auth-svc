@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import dev.tbyte.auth.dto.ForgotPasswordRequest;
 import dev.tbyte.auth.dto.JwtResponse;
 import dev.tbyte.auth.dto.LoginRequest;
 import dev.tbyte.auth.dto.RefreshTokenRequest;
@@ -43,9 +44,6 @@ public class AuthenticationController {
     private final PasswordEncoder passwordEncoder;
     private final UserService userService;
 
-    @Value("${auth.password.salt}")
-    private String salt;
-
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
         if (userRepository.findByEmail(registerRequest.getEmail()).isPresent()) {
@@ -57,7 +55,7 @@ public class AuthenticationController {
         user.setMiddleName(registerRequest.getMiddleName());
         user.setLastName(registerRequest.getLastName());
         user.setEmail(registerRequest.getEmail());
-        user.setPassword(passwordEncoder.encode(registerRequest.getPassword() + salt));
+        user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         user.setDob(registerRequest.getDob());
         user.setGender(registerRequest.getGender());
         user.setPhone(registerRequest.getPhone());
@@ -85,8 +83,9 @@ public class AuthenticationController {
     }
 
     @PostMapping("/forgot")
-    public ResponseEntity<String> forgotPassword() {
-        return ResponseEntity.ok("Forgot password flow is not implemented yet");
+    public ResponseEntity<String> forgotPassword(@Valid @RequestBody ForgotPasswordRequest forgotPasswordRequest) {
+        userService.forgotPassword(forgotPasswordRequest);
+        return ResponseEntity.ok("Password has been reset successfully");
     }
 
     @PostMapping("/refresh")

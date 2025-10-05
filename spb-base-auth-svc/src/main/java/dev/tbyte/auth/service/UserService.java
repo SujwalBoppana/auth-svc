@@ -2,6 +2,8 @@ package dev.tbyte.auth.service;
 
 import java.util.List;
 
+import dev.tbyte.auth.dto.AdminPasswordResetRequest;
+import dev.tbyte.auth.dto.ForgotPasswordRequest;
 import dev.tbyte.auth.dto.UserDto;
 import dev.tbyte.auth.entity.User;
 
@@ -19,4 +21,8 @@ public interface UserService {
     User findByEmail(String email);
 
     UserDto getUserByEmail(String email);
+
+    void forgotPassword(ForgotPasswordRequest forgotPasswordRequest);
+
+    void adminResetPassword(AdminPasswordResetRequest adminPasswordResetRequest);
 }

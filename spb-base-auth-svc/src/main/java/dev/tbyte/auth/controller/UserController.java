@@ -5,8 +5,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
+import dev.tbyte.auth.dto.AdminPasswordResetRequest;
 import dev.tbyte.auth.dto.UserDto;
 import dev.tbyte.auth.service.UserService;
 
@@ -55,5 +57,12 @@ public class UserController {
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/reset-password")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> resetPassword(@Valid @RequestBody AdminPasswordResetRequest adminPasswordResetRequest) {
+        userService.adminResetPassword(adminPasswordResetRequest);
+        return ResponseEntity.ok("Password has been reset successfully");
     }
 }

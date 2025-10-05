@@ -20,9 +20,6 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
     private final CustomUserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
 
-    @Value("${auth.password.salt}")
-    private String salt;
-
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String username = authentication.getName();
@@ -30,7 +27,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 
         UserDetails user = userDetailsService.loadUserByUsername(username);
 
-        if (passwordEncoder.matches(password + salt, user.getPassword())) {
+        if (passwordEncoder.matches(password, user.getPassword())) {
             return new UsernamePasswordAuthenticationToken(user, password, user.getAuthorities());
         } else {
             throw new BadCredentialsException("Invalid credentials");
