@@ -1,0 +1,81 @@
+package dev.tbyte.auth.controller;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import dev.tbyte.auth.dto.LoginRequest;
+import dev.tbyte.auth.dto.RegisterRequest;
+import dev.tbyte.auth.entity.Role;
+import dev.tbyte.auth.entity.User;
+import dev.tbyte.auth.repository.RoleRepository;
+import dev.tbyte.auth.repository.UserRepository;
+
+@SpringBootTest
+@AutoConfigureMockMvc
+@Transactional
+public class AuthenticationControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private RoleRepository roleRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @BeforeEach
+    void setUp() {
+        Role userRole = new Role();
+        userRole.setCode("USER");
+        userRole.setName("User");
+        roleRepository.save(userRole);
+    }
+
+    @Test
+    void whenRegisterAndLoginWithCorrectCredentials_thenReturns200AndJwt() throws Exception {
+        // Register a new user
+        RegisterRequest registerRequest = new RegisterRequest();
+        registerRequest.setEmail("testuser@example.com");
+        registerRequest.setPassword("password123");
+        registerRequest.setFirstName("Test");
+        registerRequest.setLastName("User");
+        registerRequest.setRoleCode("USER");
+
+        mockMvc.perform(post("/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(registerRequest)))
+                .andExpect(status().isOk());
+
+        // Attempt to login
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setEmail("testuser@example.com");
+        loginRequest.setPassword("password123");
+
+        mockMvc.perform(post("/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessToken").isNotEmpty())
+                .andExpect(jsonPath("$.refreshToken").isNotEmpty());
+    }
+}

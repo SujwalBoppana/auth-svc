@@ -74,10 +74,10 @@ public class AuthenticationController {
 
     @PostMapping("/login")
     public ResponseEntity<JwtResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
-        authenticationManager.authenticate(
+        Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
 
-        final UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.getEmail());
+        final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         final String accessToken = jwtUtil.generateToken(userDetails);
         final String refreshToken = jwtUtil.generateRefreshToken(userDetails);
 
