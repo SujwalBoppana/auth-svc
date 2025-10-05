@@ -59,20 +59,11 @@ public class JwtUtil {
 
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
-
-        if (userDetails instanceof dev.tbyte.auth.service.CustomUserDetails customUserDetails) {
-            claims.put("userId", customUserDetails.getId());
-        }
-
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
         claims.put("roles", roles);
         return createToken(claims, userDetails.getUsername(), expirationMs);
-    }
-
-    public Long extractUserId(String token) {
-        return extractClaim(token, claims -> claims.get("userId", Long.class));
     }
 
     public String generateRefreshToken(UserDetails userDetails) {

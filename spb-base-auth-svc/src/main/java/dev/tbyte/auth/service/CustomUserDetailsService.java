@@ -45,8 +45,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         List<UserAuthority> userAuthorities = userAuthorityRepository.findByUserId(user.getId());
         userAuthorities.forEach(ua -> grantedAuthorities.add(new SimpleGrantedAuthority(ua.getAuthority().getCode())));
 
-        return new CustomUserDetails(
-                user.getId(),
+        return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),
                 user.getPassword(),
                 grantedAuthorities);
