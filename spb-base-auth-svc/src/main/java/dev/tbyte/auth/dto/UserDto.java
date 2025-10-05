@@ -4,11 +4,13 @@ import dev.tbyte.auth.entity.Gender;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import dev.tbyte.auth.validation.PasswordMatches;
 import lombok.Data;
 
 import java.util.Date;
 
 @Data
+@PasswordMatches
 public class UserDto {
     private Long id;
 
@@ -29,6 +31,12 @@ public class UserDto {
 
     @Pattern(regexp = "^\\d{10}$", message = "Phone number must be 10 digits")
     private String phone;
+
+    @NotBlank(message = "Password is required")
+    private String password;
+
+    @NotBlank(message = "Confirm password is required")
+    private String confirmPassword;
 
     private String roleCode;
 }

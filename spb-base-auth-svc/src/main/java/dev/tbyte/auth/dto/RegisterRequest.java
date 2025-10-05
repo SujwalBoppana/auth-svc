@@ -10,8 +10,11 @@ import lombok.Data;
 import java.util.Date;
 
 import dev.tbyte.auth.entity.Gender;
+import dev.tbyte.auth.validation.PasswordMatches;
+import jakarta.validation.constraints.NotBlank;
 
 @Data
+@PasswordMatches
 public class RegisterRequest {
     @NotBlank(message = "First name is required")
     private String firstName;
@@ -38,6 +41,9 @@ public class RegisterRequest {
     @NotBlank(message = "Password is required")
     @Size(min = 8, message = "Password must be at least 8 characters long")
     private String password;
+
+    @NotBlank(message = "Confirm password is required")
+    private String confirmPassword;
 
     @NotBlank(message = "Role code is required")
     private String roleCode; // e.g., "USER", "ADMIN"

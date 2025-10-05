@@ -22,12 +22,13 @@ public class UserServiceImpl implements UserService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @org.springframework.beans.factory.annotation.Value("${auth.password.salt}")
+    private String salt;
+
     @Override
     public UserDto createUser(UserDto userDto) {
         User user = toEntity(userDto);
-        // Note: Password should be set via a registration process, not directly here.
-        // This method is for admin-level user creation.
-        user.setPassword(passwordEncoder.encode("default-password")); // Or handle password differently
+        user.setPassword(passwordEncoder.encode(userDto.getPassword() + salt));
         User savedUser = userRepository.save(user);
         return toDto(savedUser);
     }
