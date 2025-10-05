@@ -19,4 +19,6 @@ public interface RoleRepository extends JpaRepository<Role, Long> {
      * @return An Optional containing the role if found.
      */
     Optional<Role> findByCode(String code);
+
+    Optional<Role> findByName(String name);
 }
