@@ -1,5 +1,6 @@
 package dev.tbyte.auth.controller;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -42,6 +43,9 @@ public class AuthenticationController {
     private final PasswordEncoder passwordEncoder;
     private final UserService userService;
 
+    @Value("${auth.password.salt}")
+    private String salt;
+
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
         if (userRepository.findByEmail(registerRequest.getEmail()).isPresent()) {
@@ -53,7 +57,7 @@ public class AuthenticationController {
         user.setMiddleName(registerRequest.getMiddleName());
         user.setLastName(registerRequest.getLastName());
         user.setEmail(registerRequest.getEmail());
-        user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
+        user.setPassword(passwordEncoder.encode(registerRequest.getPassword() + salt));
         user.setDob(registerRequest.getDob());
         user.setGender(registerRequest.getGender());
         user.setPhone(registerRequest.getPhone());
