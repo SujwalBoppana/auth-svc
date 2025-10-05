@@ -52,6 +52,7 @@ public class AuthenticationControllerTest {
         RegisterRequest registerRequest = new RegisterRequest();
         registerRequest.setEmail("testuser@example.com");
         registerRequest.setPassword("password123");
+        registerRequest.setConfirmPassword("password123");
         registerRequest.setFirstName("Test");
         registerRequest.setLastName("User");
         registerRequest.setRoleCode("USER");
